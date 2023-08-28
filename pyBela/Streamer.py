@@ -121,7 +121,7 @@ class Streamer(Watcher):
 
         self.send_ctrl_msg(
             {"watcher": [{"cmd": "watch", "watchers": variables}]})
-
+        
     def stop_streaming(self, variables=[]):
         """
         Args:
@@ -138,11 +138,13 @@ class Streamer(Watcher):
         self._streaming_mode = "OFF"
 
         if self._saving_enabled:
+            print("Variables saved to: ", self._saving_filename)
             self._saving_enabled = False
             self._saving_filename = None
             # await all active saving tasks
             await asyncio.gather(*self._active_saving_tasks, return_exceptions=True)
             self._active_saving_tasks.clear()
+            
 
         if variables == []:
             # if no variables specified, stop streaming all watcher variables (default)
@@ -339,7 +341,7 @@ class Streamer(Watcher):
                 _channel = int(str(msg)[2])
                 _type = str(msg)[4]
 
-                assert _type in ['i', 'j', 'd',
+                assert _type in ['i', 'j', 'd','f',
                                  'c'], f"Unsupported type: {_type}"
 
                 assert _type == self._watcher_vars[_channel][

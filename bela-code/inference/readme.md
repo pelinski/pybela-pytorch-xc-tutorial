@@ -1,1 +1,0 @@
-based on Rodrigo's NeuralResonatorBela

@@ -25,11 +25,11 @@ bool setup(BelaContext *context, void *userData) {
 
 void render(BelaContext *context, void *userData) {
 
-  float pot = map(analogRead(context, 0 / gAudioFramesPerAnalogFrame, 0), 0,
+  pot = map(analogRead(context, 0 / gAudioFramesPerAnalogFrame, 0), 0,
                   0.84, 0, 3); // only check pot once per audio block
 
   for (unsigned int n = 0; n < context->audioFrames; n++) {
-    in = audioRead(context, n, 0);
+    float in = audioRead(context, n, 0);
 
     gPhase += 2.0f * (float)M_PI * gFrequency * gInverseSampleRate;
 
@@ -47,7 +47,7 @@ void render(BelaContext *context, void *userData) {
       sq = -1;
     }
 
-    float lfo;
+    float lfo = 0;
     if (pot <= 1) {
       lfo = (1 - pot) * sinf(gPhase) + pot * tri;
     } else if (pot <= 2) {

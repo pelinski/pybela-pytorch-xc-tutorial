@@ -2,6 +2,8 @@ pipenv install
 
 echo "Copying projects to Bela..."
 
+export 
+
 rsync \
 --timeout=10 \
 -avrzP  bela-code/inference \
@@ -12,5 +14,4 @@ rsync \
 -avrzP  bela-code/dataset-capture  \
 root@$BBB_HOSTNAME:Bela/projects/
 
-
-pipenv run jupyter notebook
+echo "Starting Jupyter Notebook..."

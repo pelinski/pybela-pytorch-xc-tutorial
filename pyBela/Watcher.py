@@ -204,7 +204,7 @@ class Watcher:
 
             parsed_buffer = {
                 "ref_timestamp": ref_timestamp, "data": data}
-
+            
         return parsed_buffer
 
     # utils
