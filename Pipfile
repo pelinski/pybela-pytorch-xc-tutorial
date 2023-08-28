@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+jupyter = "*"
+panel = "*"
+jupyter-bokeh = "*"
+bitarray = "*"
+notebook = "*"
+websockets = "*"
+bokeh = "*"
+ipykernel = "*"
+nest-asyncio = "*"
+aiofiles = "*"
+paramiko = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.9"
