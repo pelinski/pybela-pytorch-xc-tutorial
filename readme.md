@@ -15,4 +15,4 @@ git clone -b AIMC2023 --single-branch https://github.com/pelinski/xc-bela-contai
 cd xc-bela-container && sh run.sh
 ```
 
-This will set up the docker image, run a container, and start a jupyter notebook in the browser. Open the notebook `demo.ipynb` and follow the tutorial instructions there.
+This will set up the docker image, run a container, and start a jupyter notebook in the browser. Open the notebook `tutorial.ipynb` and follow the tutorial instructions there.
