@@ -197,14 +197,13 @@ class Watcher:
 
         else:  # dense mode
             # ensure that the buffer is the correct size
-            binary_data = binary_data[:data_length *
-                                      struct.calcsize('Q')+data_length*struct.calcsize(_type)]
+            binary_data = binary_data[:struct.calcsize('Q')+data_length*struct.calcsize(_type)]
             ref_timestamp, * \
                 data = struct.unpack('Q' + f"{_type}"*data_length, binary_data)
 
             parsed_buffer = {
                 "ref_timestamp": ref_timestamp, "data": data}
-            
+
         return parsed_buffer
 
     # utils

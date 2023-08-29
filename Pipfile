@@ -15,6 +15,7 @@ ipykernel = "*"
 nest-asyncio = "*"
 aiofiles = "*"
 paramiko = "*"
+matplotlib = "*"
 
 [dev-packages]
 

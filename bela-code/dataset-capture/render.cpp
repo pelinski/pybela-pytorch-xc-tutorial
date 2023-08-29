@@ -29,6 +29,9 @@ void render(BelaContext *context, void *userData) {
                   0.84, 0, 3); // only check pot once per audio block
 
   for (unsigned int n = 0; n < context->audioFrames; n++) {
+    uint64_t frames = context->audioFramesElapsed + n;
+		Bela_getDefaultWatcherManager()->tick(frames);
+    
     float in = audioRead(context, n, 0);
 
     gPhase += 2.0f * (float)M_PI * gFrequency * gInverseSampleRate;
