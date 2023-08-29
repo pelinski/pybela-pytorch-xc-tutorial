@@ -53,5 +53,5 @@ root@$BBB_HOSTNAME:~/Bela/projects/pot-inference/
 # Copy the ckpt file to Bela
 rsync \
 --timeout=10 \
--avzP model.jit \
+-avzP bela-code/pot-inference/model.jit \
 root@$BBB_HOSTNAME:~/

@@ -143,7 +143,6 @@ class Streamer(Watcher):
             # await all active saving tasks
             await asyncio.gather(*self._active_saving_tasks, return_exceptions=True)
             self._active_saving_tasks.clear()
-
         if variables == []:
             # if no variables specified, stop streaming all watcher variables (default)
             variables = [var["name"] for var in self.watcher_vars]
