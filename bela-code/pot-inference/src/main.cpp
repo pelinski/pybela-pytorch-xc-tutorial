@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 
     // Initialise the PRU audio device
     // Run with 16Khz by default
-    if (Bela_initAudio(settings, &opts) != 0)
+    if (Bela_initAudio(settings, &opts, 48000.0, 1.5) != 0)
     {
         Bela_InitSettings_free(settings);
         fprintf(stderr, "Error: unable to initialise audio\n");
