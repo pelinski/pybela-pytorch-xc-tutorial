@@ -6,14 +6,23 @@ In this tutorial, we will use a jupyter notebook to communicate with Bela from t
 2. Train an RNN to predict the potentiometer's values
 3. Cross-compile and deploy the model to run in real-time in Bela
 
-To avoid installation chaos, we have prepared a docker container. If you haven't got docker installed on your machine yet, you can follow the instructions [here](https://docs.docker.com/engine/install/). Once you have docker installed, start it (run the Docker GUI). Then, connect your Bela to your laptop, open a terminal and run:
+To avoid installation chaos, we have prepared a docker container. If you haven't got docker installed on your machine yet, you can follow the instructions [here](https://docs.docker.com/engine/install/). Once you have docker installed, start it (run the Docker GUI). Then, open a terminal and run:
 
 ```bash
-git clone -b AIMC2023 --single-branch --recurse-submodules https://github.com/pelinski/xc-bela-container
+docker pull pelinski/xc-bela-container:aimc2023
 ```
 
+This will pull the dockerised cross-compiler. You can start the container by running:
+
 ```bash
-cd xc-bela-container && sh run.sh
+docker run -it --name bela --env-file devcontainer.env  -p 8888:8888 pelinski/xc-bela-container:aimc2023
+```
+
+Inside the container, you can start the jupyter notebook with
+
+```bash
+pipenv run jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root
+
 ```
 
 This will set up the docker image, run a container, and start a jupyter notebook in the browser. If the notebook doesn't open automatically, look for a link of the form `http://127.0.0.1:8888/tree?token=25fdd11ba4da56070fca58ca70fb91f47bcd46b277ebe660` in the terminal output and open it in the browser. This will show a list of files, open the notebook `tutorial.ipynb` and follow the tutorial instructions there.
