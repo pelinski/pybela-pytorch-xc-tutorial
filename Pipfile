@@ -4,17 +4,8 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-jupyter = "*"
-panel = "*"
-jupyter-bokeh = "*"
-bitarray = "*"
-notebook = "*"
-websockets = "*"
-bokeh = "*"
-ipykernel = "*"
-nest-asyncio = "*"
-aiofiles = "*"
-paramiko = "*"
+pybela = "*"
+torch = "*"
 matplotlib = "*"
 
 [dev-packages]

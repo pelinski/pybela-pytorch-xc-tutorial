@@ -1,0 +1,3 @@
+[submodule "bela-code/watcher"]
+	path = bela-code/watcher
+	url = https://github.com/belaplatform/watcher
