@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pybela = "*"
+pybela = "==0.0.1"
 torch = "*"
 matplotlib = "*"
 
