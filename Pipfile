@@ -5,7 +5,6 @@ name = "pypi"
 
 [packages]
 pybela = "==0.0.1"
-torch = "*"
 matplotlib = "*"
 
 [dev-packages]
