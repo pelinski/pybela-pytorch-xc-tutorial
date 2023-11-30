@@ -37,10 +37,10 @@ rsync \
 -avzP  /opt/pytorch-install/lib/libtorch.so \
 root@$BBB_HOSTNAME:Bela/lib/libtorch.so
 
-rsync \
---timeout=10 \
--avrzP  /opt/armnn-dist/  \
-root@$BBB_HOSTNAME:/opt/armnn-dist/
+# rsync \
+# --timeout=10 \
+# -avrzP  /opt/armnn-dist/  \
+# root@$BBB_HOSTNAME:/opt/armnn-dist/
 
 
 rsync \
@@ -53,5 +53,6 @@ root@$BBB_HOSTNAME:~/Bela/projects/pot-inference/
 # Copy the ckpt file to Bela
 rsync \
 --timeout=10 \
--avzP bela-code/pot-inference/model.jit \
-root@$BBB_HOSTNAME:~/
+-avzP model.jit \
+root@$BBB_HOSTNAME:~/Bela/projects/pot-inference/
+
