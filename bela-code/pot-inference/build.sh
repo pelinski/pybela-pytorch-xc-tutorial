@@ -37,11 +37,6 @@ rsync \
 -avzP  /opt/pytorch-install/lib/libtorch.so \
 root@$BBB_HOSTNAME:Bela/lib/libtorch.so
 
-# rsync \
-# --timeout=10 \
-# -avrzP  /opt/armnn-dist/  \
-# root@$BBB_HOSTNAME:/opt/armnn-dist/
-
 
 rsync \
 --timeout=10 \
