@@ -47,7 +47,7 @@ git checkout xc
 ## Run the Docker container
 
 ```bash
-docker pull pelinski/xc-bela-container:aimc2023
+docker pull pelinski/xc-bela-container:v0.1.0
 ```
 
 This will pull the dockerised cross-compiler. You can start the container by running:
