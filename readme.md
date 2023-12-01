@@ -47,13 +47,13 @@ git checkout xc
 ## Run the Docker container
 
 ```bash
-docker pull pelinski/xc-bela-container:v0.1.0
+docker pull pelinski/xc-bela-container:v0.1.1
 ```
 
 This will pull the dockerised cross-compiler. You can start the container by running:
 
 ```bash
-docker run -it --name bela --env-file devcontainer.env  -p 8888:8888 pelinski/xc-bela-container:aimc2023
+docker run -it --name bela --env-file devcontainer.env  -p 8888:8888 pelinski/xc-bela-container:v0.1.1
 ```
 
 Inside the container, you can start the jupyter notebook with
