@@ -72,7 +72,7 @@ If you get the following error when trying to run `torch` inside the container
 RuntimeError: could not create a primitive descriptor for a matmul primitive
 ```
 
-this seems to be an error related to running pytorch on Docker on a Mac Intel machine, I have yet not found a solution for it. I suggest you instead run the jupyter notebook locally (i.e., outside the container, on your machine) and then copy the `model.jit` file to Bela using
+this seems to be an error related to running pytorch on Docker on a Mac M1/M2 machine, I have yet not found a solution for it. I suggest you instead run the jupyter notebook locally (i.e., outside the container, on your machine) and then copy the `model.jit` file to Bela using
 
 ```bash
 rsync -avzP model.jit root@$192.168.7.2:~/Bela/projects/pot-inference/
