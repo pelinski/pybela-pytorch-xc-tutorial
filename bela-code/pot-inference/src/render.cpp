@@ -107,7 +107,7 @@ void render(BelaContext *context, void *userData) {
 	float outPot = gOutputBuffer[gOutputBufferReadPointer];
     rt_printf("out: %f\n", outPot);
 
-	// Increment the read pointer in the output cicular buffer
+	// Increment the read pointer in the output circular buffer
     gOutputBufferReadPointer++;
 	if(gOutputBufferReadPointer >= gBufferSize)
 		gOutputBufferReadPointer = 0;

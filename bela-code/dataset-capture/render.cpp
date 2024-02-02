@@ -1,6 +1,7 @@
 #include <Bela.h>
 #include <Watcher.h>
 #include <cmath>
+#include <libraries/AudioFile/AudioFile.h>
 #include <libraries/Scope/Scope.h>
 
 float gFrequency = 15.0;
@@ -10,6 +11,12 @@ float gAudioFramesPerAnalogFrame;
 
 Watcher<float> pot("pot");
 Scope scope;
+
+std::string gFilename = "waves.wav";
+std::vector<std::vector<float> > gSampleData;
+int gStartFrame = 44100;
+int gEndFrame = 88200;
+unsigned int gReadPtr; 
 
 bool setup(BelaContext *context, void *userData) {
   
@@ -21,6 +28,9 @@ bool setup(BelaContext *context, void *userData) {
   gPhase = 0.0;
 
   scope.setup(3, context->audioSampleRate);
+
+  // Load the audio file
+	gSampleData = AudioFileUtilities::load(gFilename, gEndFrame - gStartFrame, gStartFrame);
 
   return true;
 }
@@ -34,7 +44,9 @@ void render(BelaContext *context, void *userData) {
     uint64_t frames = context->audioFramesElapsed + n;
 		Bela_getDefaultWatcherManager()->tick(frames);
     
-    float in = audioRead(context, n, 0);
+    // Increment read pointer and reset to 0 when end of file is reached
+    if(++gReadPtr > gSampleData[0].size())
+        gReadPtr = 0;
 
     gPhase += 2.0f * (float)M_PI * gFrequency * gInverseSampleRate;
 
@@ -62,14 +74,15 @@ void render(BelaContext *context, void *userData) {
       lfo = (3 - pot) * sq + (2 - pot) * saw;
     }
 
-    float out = lfo * in;
+		// Multiply the audio sample by the LFO value
+		float in = gSampleData[0][gReadPtr];
+		float out =  lfo * gSampleData[0][gReadPtr];
 
     scope.log(lfo, in, out);
 
-    for (unsigned int channel = 0; channel < context->audioOutChannels;
-         channel++) {
-      audioWrite(context, n, channel, out);
-    }
+		// Write the audio input to left channel, output to the right channel
+		audioWrite(context, n, 0, in);
+		audioWrite(context, n, 1, out);
   }
 }
 
