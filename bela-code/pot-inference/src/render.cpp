@@ -154,10 +154,11 @@ void render(BelaContext *context, void *userData) {
 		}
 
 		// Multiply the audio sample by the LFO value
+		float in = gSampleData[0][gReadPtr];
 		float out =  lfo * gSampleData[0][gReadPtr];
 
 		// Write the audio input to left channel, output to the right channel
-		audioWrite(context, n, 0, out);
+		audioWrite(context, n, 0, in);
 		audioWrite(context, n, 1, out);
 	}
 }
