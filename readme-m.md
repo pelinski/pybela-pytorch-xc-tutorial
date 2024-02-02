@@ -67,7 +67,7 @@ pipenv run pip3 install torch
 you can start the jupyter notebook by running:
 
 ```bash
-pipenv run jupyter notebook tutorial-m1.ipynb
+pipenv run jupyter notebook tutorial-m.ipynb
 ```
 
 Follow the steps in the notebook to record a dataset in Bela and train a model to predict the potentiometer's values.
