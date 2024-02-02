@@ -1,6 +1,6 @@
 # pybela + pytorch cross-compilation tutorial
 
-**If you are using a Mac with an Apple chip (M1/M2), follow the instructions in [readme-m.md](readme-m.md).**
+**These instructions are for Macs with Apple chips (M1/M2). If you are using a different machine, follow the instructions in [readme.md](readme.md).**
 
 In this tutorial, we will use a jupyter notebook to communicate with Bela from the host machine and:
 
@@ -46,9 +46,34 @@ cd Bela
 git checkout pybela-xc
 ```
 
-## 2. Run the Docker container and jupyter notebook
+## 2.  Run the jupyter notebook
 
-Pull the docker image:
+There seems to be a bug with pytorch when running on Docker on Mac M1/M2 machines. If you are using a Mac with an Apple chip, you should run the jupyter notebook locally (i.e., outside the container, on your machine). First, install `pipenv`:
+
+First, clone this repo and `cd` into it:
+
+```bash
+git clone https://github.com/pelinski/pybela-pytorch-xc-tutorial
+cd pybela-pytorch-xc-tutorial
+```
+
+install the python environment and torch:
+
+```bash
+pipenv install
+pipenv run pip3 install torch
+```
+
+you can start the jupyter notebook by running:
+
+```bash
+pipenv run jupyter notebook tutorial-m1.ipynb
+```
+
+Follow the steps in the notebook to record a dataset in Bela and train a model to predict the potentiometer's values.
+
+## 3. Cross-compile the inference code with Docker
+Make sure the Docker app is open.  Then, pull the docker image:
 
 ```bash
 docker pull pelinski/xc-bela-container:v0.1.1
@@ -61,20 +86,14 @@ This will pull the dockerised cross-compiler. You can start the container by run
 docker run -it --name bela --env-file devcontainer.env  -p 8888:8888 pelinski/xc-bela-container:v0.1.1
 ```
 
-Inside the container, you can start the jupyter notebook with
-
+Inside the container, you can cross-compile the Bela project with:
 ```bash
-pipenv run jupyter notebook --ip=0.0.0.0 --port=8888  --allow-root
+cd bela-code/pot-inference/ && sh build.sh
 ```
 
-This will set up the docker image, run a container, and start a jupyter notebook in the browser. If the notebook doesn't open automatically, look for a link of the form `http://127.0.0.1:8888/tree?token=<a-long-token>` in the terminal output and open it in the browser. This will show a list of files. Open the notebook `tutorial.ipynb` and follow the tutorial instructions there.
-
-## Troubleshooting
-
-If you get the following error when trying to run `torch` inside the container
-
-```
-RuntimeError: could not create a primitive descriptor for a matmul primitive
+Once deployed, you can run it from the Bela terminal (which you can access from your regular terminal typing `ssh root@bela.local`):
+```bash
+cd Bela/projects/pot-inference
+./pot-inference --modelPath ../model.jit
 ```
 
-this seems to be an error related to running pytorch on Docker on a Mac M1/M2 machine, I have yet not found a solution for it. I suggest you instead follow [these instructions](readme-m1.md) run the jupyter notebook locally (i.e., outside the container, on your machine).
