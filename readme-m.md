@@ -53,7 +53,7 @@ There seems to be a bug with pytorch when running on Docker on Mac M1/M2 machine
 First, clone this repo and `cd` into it:
 
 ```bash
-git clone https://github.com/pelinski/pybela-pytorch-xc-tutorial
+git clone --recurse-submodules -j8  https://github.com/pelinski/pybela-pytorch-xc-tutorial.git
 cd pybela-pytorch-xc-tutorial
 ```
 
