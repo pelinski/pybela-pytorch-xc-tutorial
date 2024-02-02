@@ -47,7 +47,10 @@ rsync \
 -avzP build/src/pot-inference \
 root@$BBB_HOSTNAME:~/Bela/projects/pot-inference/
 
-
+rsync \
+--timeout=10 \
+-avzP build/src/waves.wav \
+root@$BBB_HOSTNAME:~/Bela/projects/pot-inference/
 
 # Copy the ckpt file to Bela
 rsync \
