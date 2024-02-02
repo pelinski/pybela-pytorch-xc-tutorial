@@ -1,5 +1,6 @@
 #include <Bela.h>
 #include <torch/script.h>
+#include <libraries/AudioFile/AudioFile.h>
 #include <cmath>
 #include <vector>
 #include "AppOptions.h"
@@ -8,7 +9,6 @@ const int gInputWindowSize = 32;
 const int gOutputWindowSize = 32;
 const int gHopSize = 32;
 const int gBufferSize = 128;
-
 
 float gFrequency = 15.0;
 float gPhase;
@@ -30,6 +30,12 @@ float gInverseSampleRate;
 
 void inference_task_background(void *);
 
+std::string gFilename = "waves.wav";
+std::vector<std::vector<float> > gSampleData;
+int gStartFrame = 44100;
+int gEndFrame = 88200;
+unsigned int gReadPtr; 
+
 bool setup(BelaContext *context, void *userData) {
 
     printf("analog sample rate: %.1f\n", context->analogSampleRate);
@@ -43,7 +49,6 @@ bool setup(BelaContext *context, void *userData) {
 	// rate of audio frames per analog frame
 	if (context->analogFrames) gAudioFramesPerAnalogFrame = context->audioFrames / context->analogFrames;
 
-
     //gHopCounter = gHopSize;
     // Load PyTorch model
     AppOptions *opts = reinterpret_cast<AppOptions *>(userData);
@@ -54,6 +59,8 @@ bool setup(BelaContext *context, void *userData) {
         return false;
     }
 
+	// Load the audio file
+	gSampleData = AudioFileUtilities::load(gFilename, gEndFrame - gStartFrame, gStartFrame);
 
     return true;
 }
@@ -116,7 +123,12 @@ void render(BelaContext *context, void *userData) {
    
 
 	for(unsigned int n = 0; n < context->audioFrames; n++) {
-		float in = audioRead(context, n, 0);
+		
+        // Increment read pointer and reset to 0 when end of file is reached
+        if(++gReadPtr > gSampleData[0].size())
+            gReadPtr = 0;
+
+		// LFO code
 		gPhase += 2.0f * (float)M_PI * gFrequency * gInverseSampleRate;
 		if (gPhase > M_PI)
 		gPhase -= 2.0f * (float)M_PI;
@@ -126,7 +138,6 @@ void render(BelaContext *context, void *userData) {
 		if (gPhase > 0) {
 		tri = -1 + (2 * gPhase / (float)M_PI);
 		sq = 1;
-
 		} else {
 		tri = -1 - (2 * gPhase / (float)M_PI);
 		sq = -1;
@@ -142,8 +153,8 @@ void render(BelaContext *context, void *userData) {
 		lfo = (3 - outPot) * sq + (2 - outPot) * saw;
 		}
 
-		float out =  lfo * in;
-
+		// Multiply the audio sample by the LFO value
+		float out =  lfo * gSampleData[0][gReadPtr];
 
 		// Write the audio input to left channel, output to the right channel
 		audioWrite(context, n, 0, out);
