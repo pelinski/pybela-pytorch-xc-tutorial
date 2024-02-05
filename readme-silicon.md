@@ -1,6 +1,6 @@
 # pybela + pytorch cross-compilation tutorial
 
-**These instructions are for Macs with Apple chips (M1/M2). If you are using a different machine, follow the instructions in [readme.md](readme.md).**
+**These instructions are for Macs with Apple Silicon chips (M1/M2). If you are using a different machine, follow the instructions in [readme.md](readme.md).**
 
 In this tutorial, we will use a jupyter notebook to communicate with Bela from the host machine and:
 
@@ -46,9 +46,9 @@ cd Bela
 git checkout pybela-xc
 ```
 
-## 2.  Run the jupyter notebook
+## 2. Run the jupyter notebook
 
-There seems to be a bug with pytorch when running on Docker on Mac M1/M2 machines. If you are using a Mac with an Apple chip, you should run the jupyter notebook locally (i.e., outside the container, on your machine). First, install `pipenv`:
+There seems to be a bug with pytorch when running on Docker on Mac Apple Silicon (M1/M2) machines. If you are using one of these machines, you should run the jupyter notebook locally (i.e., outside the container, on your machine). First, install `pipenv`:
 
 First, clone this repo and `cd` into it:
 
@@ -57,23 +57,23 @@ git clone --recurse-submodules -j8  https://github.com/pelinski/pybela-pytorch-x
 cd pybela-pytorch-xc-tutorial
 ```
 
-install the python environment and torch:
+Then, install the required python packages (you might want to activate a python environment first):
 
 ```bash
-pipenv install
-pipenv run pip3 install torch
+pip install requirements.txt
 ```
 
 you can start the jupyter notebook by running:
 
 ```bash
-pipenv run jupyter notebook tutorial-m.ipynb
+jupyter notebook tutorial-silicon.ipynb
 ```
 
 Follow the steps in the notebook to record a dataset in Bela and train a model to predict the potentiometer's values.
 
 ## 3. Cross-compile the inference code with Docker
-Make sure the Docker app is open.  Then, pull the docker image:
+
+Make sure the Docker app is open. Then, pull the docker image:
 
 ```bash
 docker pull pelinski/xc-bela-container:v0.1.1
@@ -83,17 +83,18 @@ This will pull the dockerised cross-compiler. You can start the container by run
 (this will create the container for the first time. If you have created the container already, you can enter the container back by running `docker start -ia bela`)
 
 ```bash
-docker run -it --name bela --env-file devcontainer.env  -p 8888:8888 pelinski/xc-bela-container:v0.1.1
+docker run -it --name bela -e BBB_HOSTNAME=192.168.7.2  -p 8888:8888 pelinski/xc-bela-container:v0.1.1
 ```
 
 Inside the container, you can cross-compile the Bela project with:
+
 ```bash
 cd bela-code/pot-inference/ && sh build.sh
 ```
 
 Once deployed, you can run it from the Bela terminal (which you can access from your regular terminal typing `ssh root@bela.local`):
+
 ```bash
 cd Bela/projects/pot-inference
 ./pot-inference --modelPath ../model.jit
 ```
-
