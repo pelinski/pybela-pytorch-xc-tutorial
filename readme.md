@@ -56,6 +56,7 @@ docker pull pelinski/xc-bela-container:v0.1.2
 
 This will pull the dockerised cross-compiler. You can start the container by running:
 (this will create the container for the first time. If you have created the container already, you can enter the container back by running `docker start -ia bela`)
+If you are using a windows machine, replace `BBB_HOSTNAME=192.168.7.2` for `BBB_HOSTNAME=192.168.6.2`.
 
 ```bash
 docker run -it --name bela -e BBB_HOSTNAME=192.168.7.2 -p 8888:8888 pelinski/xc-bela-container:v0.1.2
