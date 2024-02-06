@@ -76,14 +76,14 @@ Follow the steps in the notebook to record a dataset in Bela and train a model t
 Make sure the Docker app is open. Then, pull the docker image:
 
 ```bash
-docker pull pelinski/xc-bela-container:v0.1.2
+docker pull pelinski/xc-bela-container:v0.1.3
 ```
 
 This will pull the dockerised cross-compiler. You can start the container by running:
 (this will create the container for the first time. If you have created the container already, you can enter the container back by running `docker start -ia bela`)
 
 ```bash
-docker run -it --name bela -e BBB_HOSTNAME=192.168.7.2  -p 8888:8888 pelinski/xc-bela-container:v0.1.2
+docker run -it --name bela -e BBB_HOSTNAME=192.168.7.2  -p 8888:8888 pelinski/xc-bela-container:v0.1.3
 ```
 
 Inside the container, you can cross-compile the Bela project with:
