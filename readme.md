@@ -51,7 +51,7 @@ git checkout pybela-xc
 Pull the docker image:
 
 ```bash
-docker pull pelinski/xc-bela-container:v0.1.3
+docker pull pelinski/xc-bela-container:v0.1.2
 ```
 
 This will pull the dockerised cross-compiler. You can start the container by running:
@@ -59,16 +59,23 @@ This will pull the dockerised cross-compiler. You can start the container by run
 If you are using a windows machine, replace `BBB_HOSTNAME=192.168.7.2` for `BBB_HOSTNAME=192.168.6.2`.
 
 ```bash
-docker run -it --name bela -e BBB_HOSTNAME=192.168.7.2 -p 8888:8888 pelinski/xc-bela-container:v0.1.3
+docker run -it --name bela -e BBB_HOSTNAME=192.168.7.2 -p 8888:8888 pelinski/xc-bela-container:v0.1.2
 ```
 
-Inside the container, you can start the jupyter notebook with
+Inside the container, update the repo to the latest changes:
+
+```bash
+git pull
+```
+
+
+you can start the jupyter notebook with
 
 ```bash
 pipenv run jupyter notebook --ip=0.0.0.0 --port=8888  --allow-root
 ```
 
-This will set up the docker image, run a container, and start a jupyter notebook in the browser. If the notebook doesn't open automatically, look for a link of the form `http://127.0.0.1:8888/tree?token=<a-long-token>` in the terminal output and open it in the browser. This will show a list of files. Open the notebook `tutorial.ipynb` and follow the tutorial instructions there.
+If the notebook doesn't open automatically, look for a link of the form `http://127.0.0.1:8888/tree?token=<a-long-token>` in the terminal output and open it in the browser. This will show a list of files. Open the notebook `tutorial.ipynb` and follow the tutorial instructions there.
 
 ## Troubleshooting
 
