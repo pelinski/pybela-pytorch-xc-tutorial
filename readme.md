@@ -68,7 +68,6 @@ Inside the container, update the repo to the latest changes:
 git pull
 ```
 
-
 you can start the jupyter notebook with
 
 ```bash
