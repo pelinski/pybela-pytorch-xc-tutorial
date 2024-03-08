@@ -51,7 +51,7 @@ git checkout pybela-xc
 Pull the docker image:
 
 ```bash
-docker pull pelinski/xc-bela-container:v0.1.3
+docker pull pelinski/xc-bela-container:v0.1.4
 ```
 
 This will pull the dockerised cross-compiler. You can start the container by running:
@@ -59,7 +59,7 @@ This will pull the dockerised cross-compiler. You can start the container by run
 If you are using a windows machine, replace `BBB_HOSTNAME=192.168.7.2` for `BBB_HOSTNAME=192.168.6.2`.
 
 ```bash
-docker run -it --name bela -e BBB_HOSTNAME=192.168.7.2 -p 8888:8888 pelinski/xc-bela-container:v0.1.3
+docker run -it --name bela -e BBB_HOSTNAME=192.168.7.2 -p 8888:8888 pelinski/xc-bela-container:v0.1.4
 ```
 
 Inside the container, you can start the jupyter notebook with
