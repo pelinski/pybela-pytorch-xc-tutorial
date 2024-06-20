@@ -72,6 +72,17 @@ If the notebook doesn't open automatically, look for a link of the form `http://
 
 ## Troubleshooting
 
+If you get any strange errors (possibly with `undefined reference`) when trying to compile a Bela project after switching the Bela branch (step 1), try running these commands in Bela:
+
+```bash
+ssh root@bela.local
+cd ~/Bela
+make -f Makefile.libraries cleanall
+make coreclean
+```
+
+and then try to compile the project again.
+
 If you get the following error when trying to run `torch` inside the container
 
 ```
