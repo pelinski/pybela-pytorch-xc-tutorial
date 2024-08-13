@@ -21,6 +21,7 @@ target_link_libraries(
     atomic
     sndfile
     pthread
+    rt
 )
 
 if (ENABLE_PYTORCH_FRONTEND)
