@@ -17,12 +17,12 @@ void interrupt_handler(int var)
 // Print usage information
 void usage(const char * processName)
 {
-	cerr << "Usage: " << processName << " [options]" << endl;
+	std::cerr << "Usage: " << processName << " [options]" << std::endl;
 
 	Bela_usage();
 
-	cerr << "   --modelpath [-m] model path:        path to torch .jit model\n";
-	cerr << "   --help [-h]:                        Print this menu\n";
+	std::cerr << "   --modelpath [-m] model path:        path to torch .jit model\n";
+	std::cerr << "   --help [-h]:                        Print this menu\n";
 }
 
 
