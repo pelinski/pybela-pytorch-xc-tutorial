@@ -21,15 +21,15 @@ cmake --build build -j
 
 echo "Copying files to Bela"
 
-rsync \
---timeout=10 \
--avzP  /sysroot/root/Bela/lib/libbelafull.so \
-root@$BBB_HOSTNAME:Bela/lib/libbelafull.so
+# rsync \
+# --timeout=10 \
+# -avzP  /sysroot/root/Bela/lib/libbelafull.so \
+# root@$BBB_HOSTNAME:Bela/lib/libbelafull.so
 
-rsync \
---timeout=10 \
--avzP  /opt/pytorch-install/lib/libc10.so \
-root@$BBB_HOSTNAME:Bela/lib/libc10.so
+# rsync \
+# --timeout=10 \
+# -avzP  /opt/pytorch-install/lib/libc10.so \
+# root@$BBB_HOSTNAME:Bela/lib/libc10.so
 
 rsync \
 --timeout=10 \

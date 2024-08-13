@@ -5,7 +5,6 @@
 #include <cstdio>
 #include <csignal>
 
-#include "cxxopts.hpp"
 #include "AppOptions.h"
 
 // Handle Ctrl-C by requesting that the audio rendering stop
@@ -16,38 +15,23 @@ void interrupt_handler(int var)
 
 AppOptions parseOptions(int argc, char *argv[])
 {
-    // Parse command-line options
-    cxxopts::Options options(
-        "NeuralResonatorBela",
-        "A Bela implementation of the Neural Resonator"
-    );
+    AppOptions options;
 
-    options.add_options()
-        ("modelPath", "Path to model file", cxxopts::value<std::string>())
-        ("h,help", "Print usage")
-    ;
-
-    auto result = options.parse(argc, argv);
-    if (result.count("help"))
-    {
-      fprintf(stdout, "%s", options.help().c_str());
-      exit(0);
+    for (int i = 1; i < argc; ++i) {
+        if (strcmp(argv[i], "--modelPath") == 0 && i + 1 < argc) {
+            options.modelPath = argv[++i];
+        } else if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
+            std::cout << "Usage: " << argv[0] << " --modelPath <path> [--help|-h]" << std::endl;
+            exit(0);
+        }
     }
 
-    // create a new AppOptions object
-    AppOptions opts;
-
-    if (result.count("modelPath"))
-    {
-        opts.modelPath = result["modelPath"].as<std::string>();
-    }
-    else 
-    {
-        fprintf(stderr, "Error: no model file specified\n");
-        exit(1);    
+    if (options.modelPath.empty()) {
+        std::cerr << "Error: Model path not provided. Use --modelPath <path>." << std::endl;
+        exit(1);
     }
 
-    return opts;
+    return options;
 }
 
 int main(int argc, char *argv[])
@@ -66,7 +50,7 @@ int main(int argc, char *argv[])
     settings->projectName = strrchr(argv[0], '/') + 1;
 
     // Initialise the PRU audio device
-    if (Bela_initAudio(settings, &opts, 48000.0, 1.5) != 0)
+    if (Bela_initAudio(settings, &opts) != 0)
     {
         Bela_InitSettings_free(settings);
         fprintf(stderr, "Error: unable to initialise audio\n");

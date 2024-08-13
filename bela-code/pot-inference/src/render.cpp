@@ -5,6 +5,8 @@
 #include <vector>
 #include "AppOptions.h"
 
+AppOptions parseOptions(int argc, char *argv[]);
+
 const int gInputWindowSize = 32;
 const int gOutputWindowSize = 32;
 const int gHopSize = 32;
@@ -51,9 +53,10 @@ bool setup(BelaContext *context, void *userData) {
 
     //gHopCounter = gHopSize;
     // Load PyTorch model
-    AppOptions *opts = reinterpret_cast<AppOptions *>(userData);
+    AppOptions opts = parseOptions(argc, argv);
+
     try {
-        model = torch::jit::load(opts->modelPath.c_str());
+        model = torch::jit::load(opts.modelPath.c_str());
     } catch (const c10::Error& e) {
         std::cerr << "Error loading the model: " << e.msg() << std::endl;
         return false;
