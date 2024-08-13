@@ -4,8 +4,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <csignal>
-
-#include "AppOptions.h"
+#include <cstring>
 
 // Handle Ctrl-C by requesting that the audio rendering stop
 void interrupt_handler(int var)
@@ -13,32 +12,29 @@ void interrupt_handler(int var)
     Bela_requestStop();
 }
 
-AppOptions parseOptions(int argc, char *argv[])
+// Print usage information
+void usage(const char * processName)
 {
-    AppOptions options;
+	cerr << "Usage: " << processName << " [options]" << endl;
 
-    for (int i = 1; i < argc; ++i) {
-        if (strcmp(argv[i], "--modelPath") == 0 && i + 1 < argc) {
-            options.modelPath = argv[++i];
-        } else if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
-            std::cout << "Usage: " << argv[0] << " --modelPath <path> [--help|-h]" << std::endl;
-            exit(0);
-        }
-    }
+	Bela_usage();
 
-    if (options.modelPath.empty()) {
-        std::cerr << "Error: Model path not provided. Use --modelPath <path>." << std::endl;
-        exit(1);
-    }
-
-    return options;
+	cerr << "   --modelpath [-m] model path:        path to torch .jit model\n";
+	cerr << "   --help [-h]:                        Print this menu\n";
 }
+
 
 int main(int argc, char *argv[])
 {
-    // Parse command-line options
-    AppOptions opts = parseOptions(argc, argv);
     BelaInitSettings *settings = Bela_InitSettings_alloc();
+    std::string modelPath = "model.jit";
+
+    struct option customOptions[] =
+	{
+		{"help", 0, NULL, 'h'},
+		{"modelpath", 1, NULL, 'm'},
+		{NULL, 0, NULL, 0}
+	};
 
     // Set default settings
     Bela_defaultSettings(settings);
@@ -46,11 +42,42 @@ int main(int argc, char *argv[])
     settings->render = render;
     settings->cleanup = cleanup;
 
-    // Set the project name for use in the GUI
-    settings->projectName = strrchr(argv[0], '/') + 1;
+	{
+		char* nameWithSlash = strrchr(argv[0], '/');
+		settings->projectName = nameWithSlash ? nameWithSlash + 1 : argv[0];
+	}
+
+	// Parse command-line arguments
+	while (1) {
+		int c = Bela_getopt_long(argc, argv, "hm:", customOptions, settings);
+		if (c < 0)
+		{
+			break;
+		}
+		int ret = -1;
+		switch (c) {
+			case 'h':
+				usage(basename(argv[0]));
+				ret = 0;
+				break;
+			case 'm':
+				modelPath = optarg;
+				break;
+			default:
+				usage(basename(argv[0]));
+				ret = 1;
+				break;
+		}
+		if(ret >= 0)
+		{
+			Bela_InitSettings_free(settings);
+			return ret;
+		}
+	}
+
 
     // Initialise the PRU audio device
-    if (Bela_initAudio(settings, &opts) != 0)
+    if (Bela_initAudio(settings, &modelPath) != 0)
     {
         Bela_InitSettings_free(settings);
         fprintf(stderr, "Error: unable to initialise audio\n");

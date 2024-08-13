@@ -3,9 +3,6 @@
 #include <libraries/AudioFile/AudioFile.h>
 #include <cmath>
 #include <vector>
-#include "AppOptions.h"
-
-AppOptions parseOptions(int argc, char *argv[]);
 
 const int gInputWindowSize = 32;
 const int gOutputWindowSize = 32;
@@ -36,7 +33,9 @@ std::string gFilename = "waves.wav";
 std::vector<std::vector<float> > gSampleData;
 int gStartFrame = 44100;
 int gEndFrame = 88200;
-unsigned int gReadPtr; 
+unsigned int gReadPtr;
+
+std::string gModelPath = "model.jit";
 
 bool setup(BelaContext *context, void *userData) {
 
@@ -53,10 +52,12 @@ bool setup(BelaContext *context, void *userData) {
 
     //gHopCounter = gHopSize;
     // Load PyTorch model
-    AppOptions opts = parseOptions(argc, argv);
+
+	if(userData != 0)
+	gModelPath = *(std::string *)userData;
 
     try {
-        model = torch::jit::load(opts.modelPath.c_str());
+        model = torch::jit::load(gModelPath);
     } catch (const c10::Error& e) {
         std::cerr << "Error loading the model: " << e.msg() << std::endl;
         return false;
