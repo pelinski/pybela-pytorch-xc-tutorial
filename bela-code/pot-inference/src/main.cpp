@@ -1,10 +1,12 @@
 
 #include <Bela.h>
 #include <iostream>
-#include <cstdlib>
-#include <cstdio>
 #include <csignal>
-#include <cstring>
+#include <unistd.h>
+#include <iostream>
+#include <signal.h>
+#include <getopt.h>
+#include <string.h>
 
 // Handle Ctrl-C by requesting that the audio rendering stop
 void interrupt_handler(int var)
