@@ -11,7 +11,7 @@ target_include_directories(
 target_link_libraries(
     ${EXE_NAME}
     PRIVATE
-    ${BELA_ROOT}/lib/libbela.so
+    ${BELA_ROOT}/lib/libbelafull.so
     ${COBALT_LIB}
     ${NEON_LIB}
     ${MATHNEON_LIB}
