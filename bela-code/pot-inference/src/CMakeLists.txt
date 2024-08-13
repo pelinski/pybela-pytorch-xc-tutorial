@@ -21,10 +21,9 @@ target_link_libraries(
     atomic
     sndfile
     pthread
-    rt
 )
 
 if (ENABLE_PYTORCH_FRONTEND)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
-    target_link_libraries(${EXE_NAME} PRIVATE ${TORCH_LIBRARIES})
+    target_link_libraries(${EXE_NAME} PRIVATE ${TORCH_LIBRARIES} rt)
 endif()
