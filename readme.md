@@ -8,50 +8,13 @@ In this tutorial, we will use a jupyter notebook to communicate with Bela from t
 2. Train an RNN to predict the potentiometer's values using [pytorch](https://pytorch.org/)
 3. Cross-compile and deploy the model to run in real-time in Bela
 
+## Quickstart
 To avoid installation chaos, we have prepared a docker container. If you haven't got docker installed on your machine yet, you can follow the instructions [here](https://docs.docker.com/engine/install/). Once you have docker installed, start it (open the Docker app).
-
-## 1. Set up your Bela
-
-You will need the Bela experimental image `v0.5.0alpha2` which can be downloaded here https://github.com/BelaPlatform/bela-image-builder/releases/tag/v0.5.0alpha2. Follow [these instructions](https://learn.bela.io/using-bela/bela-techniques/managing-your-sd-card/#flash-an-sd-card-using-balena-etcher) to flash that image onto your Bela.
-
-Follow the instructions below to checkout the Bela repo to commit `7d99f81` on the `pybela-xc` branch at https://github.com/pelinski/Bela/. You can check which commit you are in with `git rev-parse --short HEAD`.
-
-### Option A: Bela connected to internet
-
-If your Bela is connected to the internet, you can do this by ssh-ing into it and running
-
-```bash
-git remote add pelinski https://github.com/pelinski/Bela.git
-git fetch pelinski
-git checkout pybela-xc
-```
-
-### Option B: Bela not connected to internet
-
-If your Bela is not connected to the internet, you can still update the Bela repo running:
-
-```bash
-git clone https://github.com/pelinski/Bela.git
-cd Bela
-git remote add board root@bela.local:Bela/
-git checkout pybela-xc
-git push -f board pybela-xc:pybela-xc
-```
-
-Then, ssh into Bela and run
-
-```bash
-ssh root@bela.local
-cd Bela
-git checkout pybela-xc
-```
-
-## 2. Run the Docker container and jupyter notebook
 
 Pull the docker image:
 
 ```bash
-docker pull pelinski/xc-bela-container:v0.1.4
+docker pull pelinski/pybela-pytorch-tutorial:v0.1.0
 ```
 
 This will pull the dockerised cross-compiler. You can start the container by running:
@@ -59,16 +22,16 @@ This will pull the dockerised cross-compiler. You can start the container by run
 If you are using a windows machine, replace `BBB_HOSTNAME=192.168.7.2` for `BBB_HOSTNAME=192.168.6.2`.
 
 ```bash
-docker run -it --name bela -e BBB_HOSTNAME=192.168.7.2 -p 8888:8888 pelinski/xc-bela-container:v0.1.4
+docker run -it --name bela-tutorial -e BBB_HOSTNAME=192.168.7.2 -p 8889:8889 pelinski/pybela-pytorch-tutorial:v0.1.0
 ```
 
 Inside the container, you can start the jupyter notebook with
 
 ```bash
-pipenv run jupyter notebook --ip=0.0.0.0 --port=8888  --allow-root
+jupyter notebook --ip=* --port=8889  --allow-root --no-browser
 ```
 
-If the notebook doesn't open automatically, look for a link of the form `http://127.0.0.1:8888/tree?token=<a-long-token>` in the terminal output and open it in the browser. This will show a list of files. Open the notebook `tutorial.ipynb` and follow the tutorial instructions there.
+Look for a link of the form `http://127.0.0.1:8888/tree?token=<a-long-token>` in the terminal output and open it in the browser. This will show a list of files. Open the notebook `tutorial.ipynb` and follow the tutorial instructions there. If the link does not work, try changing the port number `8889` to another value, e.g., `5555`.
 
 ## Troubleshooting
 

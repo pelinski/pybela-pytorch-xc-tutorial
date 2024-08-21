@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.18)
 
-project(pot-inference)
+if(NOT DEFINED PROJECT_NAME)
+    set(PROJECT_NAME "project")
+endif()
+
+project(${PROJECT_NAME})
 
 ####################################
 add_compile_options(
@@ -43,6 +47,41 @@ find_library(MATHNEON_LIB REQUIRED
 
 ####################################
 
+add_subdirectory(src)
+
+set(EXE_NAME ${PROJECT_NAME})
+
+file(GLOB SRC_FILES *.cpp)
+
+# If main.cpp is not found, append default_main.cpp
+list(FIND SRC_FILES main.cpp main_index)
+if(main_index EQUAL -1)
+    list(APPEND SRC_FILES /sysroot/root/Bela/core/default_main.cpp)
+endif()
+
+add_executable(${EXE_NAME} ${SRC_FILES})
+
+target_include_directories(
+    ${EXE_NAME} PRIVATE ${BELA_ROOT} ${BELA_ROOT}/include
+)
+
+target_link_libraries(
+    ${EXE_NAME}
+    PRIVATE
+    ${BELA_ROOT}/lib/libbelafull.so
+    ${COBALT_LIB}
+    ${NEON_LIB}
+    ${MATHNEON_LIB}
+    dl
+    prussdrv
+    asound
+    atomic
+    sndfile
+    pthread
+)
+
+####################################
+
 set(ENABLE_PYTORCH_FRONTEND OFF CACHE BOOL "ENABLE_PYTORCH_FRONTEND")
 
 if(ENABLE_PYTORCH_FRONTEND)
@@ -54,5 +93,7 @@ if(ENABLE_PYTORCH_FRONTEND)
     find_package(Torch REQUIRED)
 endif()
 
-
-add_subdirectory(src)
+if (ENABLE_PYTORCH_FRONTEND)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
+    target_link_libraries(${EXE_NAME} PRIVATE ${TORCH_LIBRARIES} rt)
+endif()
