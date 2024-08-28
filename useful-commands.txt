@@ -1,0 +1,14 @@
+# remove the container
+docker rm tutorial 
+
+# build the image
+docker build -t xc-pybela-tutorial .
+
+# create a container
+docker run -it --name tutorial -e BBB_HOSTNAME=192.168.7.2 -p 8889:8889 xc-pybela-tutorial
+
+# run notebook inside the container
+jupyter notebook --ip=* --port=8889  --allow-root --no-browser
+
+# reopen container 
+docker start -ia tutorial

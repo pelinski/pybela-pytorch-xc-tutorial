@@ -1,11 +1,9 @@
-# pybela + pytorch cross-compilation tutorial
-
-**If you are using a Mac with an Apple chip (M1/M2), follow the instructions in [readme-silicon.md](readme-silicon.md).**
+# pybela + pytorch bela cross-compilation tutorial
 
 In this tutorial, we will use a jupyter notebook to communicate with Bela from the host machine and:
 
 1. Record a dataset of sensor data using [pybela](https://github.com/belaplatform/pybela)
-2. Train an RNN to predict the sensor data using [pytorch](https://pytorch.org/)
+2. Train a TCN to predict the sensor data using [pytorch](https://pytorch.org/)
 3. Cross-compile with the [xc-bela-container](https://github.com/pelinski/xc-bela-container) and deploy the model to run in real-time in Bela
 
 ## Setting up your Bela
@@ -14,10 +12,9 @@ You will need to flash the Bela experimental image `v0.5.0alpha2` which can be d
 
 Once the image is flashed, insert the microSD into your Bela and connect it to your computer. Inside the container (in the next section) we will run a script that will copy the necessary libraries to your Bela and updates its core code. 
 
-
 ## Quickstart
 
-If you haven't got docker installed on your machine yet, you can follow the instructions [here](https://docs.docker.com/engine/install/). Once you have docker installed, start it (open the Docker app).
+If you haven't got docker installed on your machine yet, you can follow the instructions [here](https://docs.docker.com/engine/install/). Once you have docker installed, start it (open the Docker app). There is no need to create an account to follow this tutorial.
 
 Pull the docker image:
 
@@ -62,11 +59,3 @@ make coreclean
 ```
 
 and then try to compile the project again.
-
-If you get the following error when trying to run `torch` inside the container
-
-```
-RuntimeError: could not create a primitive descriptor for a matmul primitive
-```
-
-this seems to be an error related to running pytorch on Docker on a Mac M1/M2 machine, I have yet not found a solution for it. I suggest you instead follow [these instructions](readme-silicon.md) run the jupyter notebook locally (i.e., outside the container, on your machine).
