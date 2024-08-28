@@ -9,15 +9,19 @@
 
 // torch buffers
 const int gWindowSize = 512;
-const int gBufferSize = 100 * gWindowSize;
-int gOutputBufferWritePointer = 50 * gWindowSize;
+int gNumTargetWindows = 1;
+const int gInputBufferSize = 100 * gWindowSize;
+const int gOutputBufferSize = gNumTargetWindows * gInputBufferSize;
+int gOutputBufferWritePointer = 2 * gWindowSize;
+int gDebugPrevBufferWritePointer = gOutputBufferWritePointer;
+int gDebugFrameCounter = 0;
 int gOutputBufferReadPointer = 0;
 int gInputBufferPointer = 0;
 int gWindowFramesCounter = 0;
-std::vector<std::vector<float>> gInputBuffer(N_VARS,
-                                             std::vector<float>(gBufferSize));
-std::vector<std::vector<float>> gOutputBuffer(N_VARS,
-                                              std::vector<float>(gBufferSize));
+std::vector<std::vector<float>>
+    gInputBuffer(N_VARS, std::vector<float>(gInputBufferSize));
+std::vector<std::vector<float>>
+    gOutputBuffer(N_VARS, std::vector<float>(gOutputBufferSize));
 torch::jit::script::Module model;
 std::vector<std::vector<float>> unwrappedBuffer(gWindowSize,
                                                 std::vector<float>(N_VARS));
@@ -68,17 +72,19 @@ bool setup(BelaContext *context, void *userData) {
     std::cerr << "Error loading the model: " << e.msg() << std::endl;
     return false;
   }
-  // Dummy inference
+  // Warm up inference
   try {
     // Create a dummy input tensor
     torch::Tensor dummy_input = torch::rand({1, 512, 2});
 
-    // Perform a forward pass
     auto output = model.forward({dummy_input}).toTensor();
+    output = model.forward({dummy_input}).toTensor();
+    output = model.forward({dummy_input}).toTensor();
 
     // Print the result
-    std::cout << "Dummy inference output: "
-              << output.slice(/*dim=*/1, /*start=*/0, /*end=*/5) << std::endl;
+    std::cout << "Input tensor dimensions: " << dummy_input.sizes()
+              << std::endl;
+    std::cout << "Output tensor dimensions: " << output.sizes() << std::endl;
   } catch (const c10::Error &e) {
     std::cerr << "Error during dummy inference: " << e.msg() << std::endl;
     return false;
@@ -90,52 +96,59 @@ bool setup(BelaContext *context, void *userData) {
 
   return true;
 }
-
 void inference_task(const std::vector<std::vector<float>> &inBuffer,
                     unsigned int inPointer,
                     std::vector<std::vector<float>> &outBuffer,
                     unsigned int outPointer) {
-  //   if (start) {
-  //     start = 0;
-  //     RtThread::setThisThreadPriority(1);
-  //   }
+  RtThread::setThisThreadPriority(1);
 
-  for (int n = 0; n < gWindowSize; n++) {
-    int circularBufferIndex =
-        (inPointer + n - gWindowSize + gBufferSize) % gBufferSize;
-    // rt_printf("%d\n" , circularBufferIndex);
-    for (int i = 0; i < N_VARS; i++) {
-      unwrappedBuffer[n][i] = inBuffer[i][circularBufferIndex];
+  // Precompute circular buffer indices
+  std::vector<int> circularIndices(gWindowSize);
+  for (int n = 0; n < gWindowSize; ++n) {
+    circularIndices[n] = (inPointer + n - gWindowSize + gInputBufferSize) % gInputBufferSize;
+  }
+
+  // Fill unwrappedBuffer using precomputed indices
+  for (int n = 0; n < gWindowSize; ++n) {
+    for (int i = 0; i < N_VARS; ++i) {
+      unwrappedBuffer[n][i] = inBuffer[i][circularIndices[n]];
     }
   }
 
-  // Convert unwrappedBuffer to a Torch tensor
-  torch::Tensor inputTensor =
-      torch::from_blob(unwrappedBuffer.data(), {1, gWindowSize, N_VARS})
-          .clone();
+  // Convert unwrappedBuffer to a Torch tensor without additional copying
+  torch::Tensor inputTensor = torch::from_blob(unwrappedBuffer.data(), {1, gWindowSize, N_VARS}, torch::kFloat).clone();
 
   // Perform inference
   torch::Tensor outputTensor = model.forward({inputTensor}).toTensor();
-  outputTensor = outputTensor.squeeze(0);
+  outputTensor = outputTensor.squeeze(0);  // Shape: [gNumTargetWindows * gWindowSize, N_VARS]
 
-  // Copy outputTensor to outBuffer
-  for (int n = 0; n < gWindowSize; n++) {
-    int circularBufferIndex = (outPointer + n) % gBufferSize;
-    for (int i = 0; i < N_VARS; i++) {
-      outBuffer[i][circularBufferIndex] = outputTensor[n][i].item<float>();
+  // Prepare a pointer to the output tensor's data
+  float* outputData = outputTensor.data_ptr<float>();
+
+  // Precompute output circular buffer indices
+  std::vector<int> outCircularIndices(gNumTargetWindows * gWindowSize);
+  for (int n = 0; n < gNumTargetWindows * gWindowSize; ++n) {
+    outCircularIndices[n] = (outPointer + n) % gOutputBufferSize;
+  }
+
+  // Fill outBuffer using precomputed indices and outputData
+  for (int n = 0; n < gNumTargetWindows * gWindowSize; ++n) {
+    int circularBufferIndex = outCircularIndices[n];
+    for (int i = 0; i < N_VARS; ++i) {
+      outBuffer[i][circularBufferIndex] = outputData[n * N_VARS + i];
     }
   }
 }
 
 void inference_task_background(void *) {
-  if (start) {
-    start = 0;
-    RtThread::setThisThreadPriority(1);
-  }
+
+  RtThread::setThisThreadPriority(1);
+
   inference_task(gInputBuffer, gInputBufferPointer, gOutputBuffer,
                  gOutputBufferWritePointer);
   gOutputBufferWritePointer =
-      (gOutputBufferWritePointer + gWindowSize) % gBufferSize;
+      (gOutputBufferWritePointer + gNumTargetWindows * gWindowSize) %
+      gOutputBufferSize;
 }
 
 void render(BelaContext *context, void *userData) {
@@ -157,7 +170,7 @@ void render(BelaContext *context, void *userData) {
         // -- pytorch buffer
         gInputBuffer[0][gInputBufferPointer] = pot1;
         gInputBuffer[1][gInputBufferPointer] = pot2;
-        if (++gInputBufferPointer >= gBufferSize) {
+        if (++gInputBufferPointer >= gInputBufferSize) {
           // Wrap the circular buffer
           // Notice: this is not the condition for starting a new inference
           gInputBufferPointer = 0;
@@ -165,11 +178,20 @@ void render(BelaContext *context, void *userData) {
 
         if (++gWindowFramesCounter >= gWindowSize) {
           gWindowFramesCounter = 0;
-          // gInputBufferPointer = (gInputBufferPointer + gWindowSize) %
-          // gBufferSize;
           gCachedInputBufferPointer = gInputBufferPointer;
           Bela_scheduleAuxiliaryTask(gInferenceTask);
         }
+
+        // debugging
+        gDebugFrameCounter++;
+        if (gOutputBufferWritePointer != gDebugPrevBufferWritePointer) {
+          rt_printf("aux task took: %d, write pointer - read pointer: %d \n",
+                    gDebugFrameCounter,
+                    gOutputBufferWritePointer - gOutputBufferReadPointer);
+          gDebugPrevBufferWritePointer = gOutputBufferWritePointer;
+          gDebugFrameCounter = 0;
+        }
+
         // Get the output sample from the output buffer
         outpot1 = gOutputBuffer[0][gOutputBufferReadPointer];
         outpot2 = gOutputBuffer[1][gOutputBufferReadPointer];
@@ -177,13 +199,13 @@ void render(BelaContext *context, void *userData) {
         // rt_printf("read pointer: %d, write pointer %d \n",
         //           gOutputBufferReadPointer, gOutputBufferWritePointer);
         // Increment the read pointer in the output circular buffer
-        if ((gOutputBufferReadPointer + 1) % gBufferSize ==
+        if ((gOutputBufferReadPointer + 1) % gOutputBufferSize ==
             gOutputBufferWritePointer) {
           rt_printf("Warning: output buffer overrun\n");
         } else {
           gOutputBufferReadPointer++;
         }
-        if (gOutputBufferReadPointer >= gBufferSize)
+        if (gOutputBufferReadPointer >= gOutputBufferSize)
           gOutputBufferReadPointer = 0;
 
         // --
