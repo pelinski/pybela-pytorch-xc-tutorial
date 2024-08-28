@@ -9,14 +9,13 @@ RUN pip install -r requirements.txt
 COPY docker-scripts/download_libtorch.sh ./
 RUN ./download_libtorch.sh  && rm download_libtorch.sh
 
-COPY tutorial/bela-code/watcher /sysroot/root/Bela/projects/watcher/
+# rev C
+RUN git clone https://github.com/BelaPlatform/bb.org-overlays.git /sysroot/opt/bb.org-overlays
 
-COPY tutorial/bela-code/dataset-capture/ /sysroot/root/Bela/projects/dataset-capture/
+RUN mkdir -p /root/pybela-pytorch-xc-tutorial
 
-COPY tutorial/bela-code/pot-inference /sysroot/root/Bela/projects/pot-inference/
+COPY tutorial/ /root/pybela-pytorch-xc-tutorial/
 
-COPY tutorial/bela-code/pybela-basic /sysroot/root/Bela/projects/pybela-basic/
+WORKDIR /root/pybela-pytorch-xc-tutorial
 
-COPY tutorial/tutorial.ipynb /sysroot/root/Bela/projects/
-      
 CMD /bin/bash

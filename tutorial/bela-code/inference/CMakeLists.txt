@@ -47,22 +47,21 @@ find_library(MATHNEON_LIB REQUIRED
 
 ####################################
 
-add_subdirectory(src)
-
 set(EXE_NAME ${PROJECT_NAME})
 
 file(GLOB SRC_FILES *.cpp)
 
-# If main.cpp is not found, append default_main.cpp
-list(FIND SRC_FILES main.cpp main_index)
-if(main_index EQUAL -1)
-    list(APPEND SRC_FILES /sysroot/root/Bela/core/default_main.cpp)
+# Check if main.cpp exists in the current directory
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp")
+    list(APPEND SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp")
+else()
+    list(APPEND SRC_FILES "/sysroot/root/Bela/core/default_main.cpp")
 endif()
 
 add_executable(${EXE_NAME} ${SRC_FILES})
 
 target_include_directories(
-    ${EXE_NAME} PRIVATE ${BELA_ROOT} ${BELA_ROOT}/include
+    ${EXE_NAME} PRIVATE ${BELA_ROOT} ${BELA_ROOT}/include ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 target_link_libraries(
@@ -82,18 +81,12 @@ target_link_libraries(
 
 ####################################
 
-set(ENABLE_PYTORCH_FRONTEND OFF CACHE BOOL "ENABLE_PYTORCH_FRONTEND")
+message(STATUS "Enabling PyTorch frontend")
+add_compile_definitions(ENABLE_PYTORCH_FRONTEND)
+# find pytorch
+# -DCMAKE_PREFIX_PATH=/absolute/path/to/libtorch
+list(APPEND CMAKE_PREFIX_PATH /sysroot/opt/pytorch-install)
+find_package(Torch REQUIRED)
 
-if(ENABLE_PYTORCH_FRONTEND)
-    message(STATUS "Enabling PyTorch frontend")
-    add_compile_definitions(ENABLE_PYTORCH_FRONTEND)
-    # find pytorch
-    # -DCMAKE_PREFIX_PATH=/absolute/path/to/libtorch
-    list(APPEND CMAKE_PREFIX_PATH /opt/pytorch-install)
-    find_package(Torch REQUIRED)
-endif()
-
-if (ENABLE_PYTORCH_FRONTEND)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
-    target_link_libraries(${EXE_NAME} PRIVATE ${TORCH_LIBRARIES} rt)
-endif()
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
+target_link_libraries(${EXE_NAME} PRIVATE ${TORCH_LIBRARIES} rt)

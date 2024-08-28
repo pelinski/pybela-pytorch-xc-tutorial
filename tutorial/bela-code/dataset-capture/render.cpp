@@ -9,8 +9,8 @@ float gPhase;
 float gInverseSampleRate;
 unsigned int gAudioFramesPerAnalogFrame;
 
-Watcher<float> pot("pot");
-Watcher<float> pie("pie");
+Watcher<float> pot1("pot1");
+Watcher<float> pot2("pot2");
 Scope scope;
 
 std::string gFilename = "waves.wav";
@@ -41,12 +41,17 @@ bool setup(BelaContext *context, void *userData) {
 void render(BelaContext *context, void *userData) {
 
   for (unsigned int n = 0; n < context->audioFrames; n++) {
-    uint64_t frames = int((context->audioFramesElapsed + n)/2);
-    Bela_getDefaultWatcherManager()->tick(frames);
+    uint64_t frames = int((context->audioFramesElapsed + n) / 2);
     if (gAudioFramesPerAnalogFrame && !(n % gAudioFramesPerAnalogFrame)) {
-      pot = map(analogRead(context, n / gAudioFramesPerAnalogFrame, 0), 0, 0.84,
-                0, 3); // only check pot once per audio block
-      pie = 4*audioRead(context, n / gAudioFramesPerAnalogFrame, 0);
+
+      if (n == 0) { // only update the pot values once per block
+        Bela_getDefaultWatcherManager()->tick(frames);
+        pot1 = map(analogRead(context, n / gAudioFramesPerAnalogFrame, 0), 0,
+                   0.84, 0, 3);
+        pot2 = map(analogRead(context, n / gAudioFramesPerAnalogFrame, 1), 0,
+                   0.84, 0, 3);
+      }
+
       // Increment read pointer and reset to 0 when end of file is reached
       if (++gReadPtr > gSampleData[0].size())
         gReadPtr = 0;
@@ -68,18 +73,18 @@ void render(BelaContext *context, void *userData) {
       }
 
       float lfo = 0;
-      if (pot <= 1) {
-        lfo = (1 - pot) * sinf(gPhase) + pot * tri;
-      } else if (pot <= 2) {
-        lfo = (2 - pot) * tri + (1 - pot) * sq;
-      } else if (pot <= 3) {
+      if (pot1 <= 1) {
+        lfo = (1 - pot1) * sinf(gPhase) + pot1 * tri;
+      } else if (pot1 <= 2) {
+        lfo = (2 - pot1) * tri + (1 - pot1) * sq;
+      } else if (pot1 <= 3) {
         float saw = 1 - (1 / (float)M_PI * gPhase);
-        lfo = (3 - pot) * sq + (2 - pot) * saw;
+        lfo = (3 - pot1) * sq + (2 - pot1) * saw;
       }
 
       // Multiply the audio sample by the LFO value
       float in = gSampleData[0][gReadPtr];
-      float out = pie*lfo * gSampleData[0][gReadPtr];
+      float out = pot2 * lfo * gSampleData[0][gReadPtr];
 
       scope.log(lfo, in, out);
 

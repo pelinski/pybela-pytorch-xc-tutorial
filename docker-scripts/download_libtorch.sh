@@ -1,8 +1,6 @@
-if [ ! -d "/opt/pytorch-install" ]; then
-    echo "Pytorch not found in /opt/pytorch-install"
+#!/bin/bash -e
+mkdir -p /sysroot/opt/pytorch-install
 
-    # Download pytorch to /opt/pytorch-install
-    url=https://github.com/rodrigodzf/bela-torch/releases/download/master/pytorch-install.tar.gz
-    echo "Downloading Pytorch from $url"
-    wget -O - $url | tar -xz -C /opt
-fi
+url=https://github.com/pelinski/bela-torch/releases/download/v1.13.1/pytorch-v1.13.1.tar.gz
+echo "Downloading Pytorch from $url"
+wget -O - $url | tar -xz -C /sysroot/opt/pytorch-install

@@ -3,3 +3,4 @@ __pycache__/
 *bin
 dev.txt
 log*
+.DS_Store
