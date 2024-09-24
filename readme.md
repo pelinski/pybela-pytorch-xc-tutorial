@@ -10,7 +10,7 @@ In this tutorial, we will use a jupyter notebook to communicate with Bela from t
 
 You will need to flash the Bela experimental image `v0.5.0alpha2` which can be downloaded [here](https://github.com/BelaPlatform/bela-image-builder/releases/tag/v0.5.0alpha2). You can follow [these instructions](https://learn.bela.io/using-bela/bela-techniques/managing-your-sd-card/#flash-an-sd-card-using-balena-etcher) to flash the image onto your Bela's microSD card.
 
-Once the image is flashed, insert the microSD into your Bela and connect it to your computer. Inside the container (in the next section) we will run a script that will copy the necessary libraries to your Bela and updates its core code. 
+Once the image is flashed, insert the microSD into your Bela and connect it to your computer. Inside the container (in the next section) we will run a script that will copy the necessary libraries to your Bela and updates its core code.
 
 ## Quickstart
 
@@ -19,7 +19,7 @@ If you haven't got docker installed on your machine yet, you can follow the inst
 Pull the docker image:
 
 ```bash
-docker pull pelinski/pybela-pytorch-xc-tutorial:v0.1.0
+docker pull pelinski/pybela-pytorch-xc-tutorial:v0.1.1
 ```
 
 This will pull the dockerised cross-compiler. You can start the container by running:
@@ -27,7 +27,7 @@ This will pull the dockerised cross-compiler. You can start the container by run
 If you are using a windows machine, replace `BBB_HOSTNAME=192.168.7.2` for `BBB_HOSTNAME=192.168.6.2`.
 
 ```bash
-docker run -it --name bela-tutorial -e BBB_HOSTNAME=192.168.7.2 -p 8889:8889 pelinski/pybela-pytorch-xc-tutorial:v0.1.0
+docker run -it --name bela-tutorial -e BBB_HOSTNAME=192.168.7.2 -p 8889:8889 pelinski/pybela-pytorch-xc-tutorial:v0.1.1
 ```
 
 **If you are using your own Bela** (i.e., not the ones prepared for the workshop), you will need to copy a couple of libraries to Bela and update its core code. If your Bela has a rev C cape you will also need to update the Bela cape firmware. You can do this by running the following commands inside the container:

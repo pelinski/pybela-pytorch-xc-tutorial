@@ -4,3 +4,4 @@ __pycache__/
 dev.txt
 log*
 .DS_Store
+flash-belas/
